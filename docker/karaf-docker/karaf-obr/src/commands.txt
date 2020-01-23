@@ -1,0 +1,47 @@
+config:edit org.ops4j.pax.url.mvn
+config:property-set org.ops4j.pax.url.mvn.repositories "https://repo1.maven.org/maven2@id=central, https://repository.apache.org/content/groups/snapshots-group@id=apache@snapshots@noreleases, https://oss.sonatype.org/content/repositories/ops4j-snapshots@id=ops4j.sonatype.snapshots.deploy@snapshots@noreleases"
+# config:property-set org.ops4j.pax.url.mvn.repositories "https://repo1.maven.org/maven2@id=central, https://maven.jx.tourgeek.com/repository/maven-public@id=ops4j.sonatype.snapshots.deploy@snapshots@noreleases"
+config:update
+feature:install http obr war
+
+
+sed -i '$ a\feature\:install http obr war' /opt/apache/karaf/etc/shell.init.script
+
+RUN $KARAF_HOME/bin/start;\
+ps -A;\
+sleep 20;\
+ps -A;\
+cat /tmp/src/commands.txt;\
+$KARAF_HOME/bin/client -f /tmp/src/commands.txt;\
+ps -A;\
+sleep 5;\
+$KARAF_HOME/bin/client feature:install obr;\
+ps -A;\
+sleep 5;\
+$KARAF_HOME/bin/stop;\
+ps -A;\
+sleep 10
+
+sed -i '/^    http:\/\/repository.apache.org/d' /opt/apache/karaf/etc/org.ops4j.pax.url.mvn.cfg
+sed -i '/^    https://oss.sonatype.org/d' /opt/apache/karaf/etc/org.ops4j.pax.url.mvn.cfg
+sed -i 's/\@id=central, \\/\@id=central, \\\nhttps:\/\/maven.jx.tourgeek.com\/repository\/maven-public\@id=ops4j.sonatype.snapshots.deploy\@snapshots\@noreleases/g' /opt/apache/karaf/etc/org.ops4j.pax.url.mvn.cfg
+
+
+sed -i 's/feature\:install http obr war//g' /opt/apache/karaf/etc/shell.init.script
+
+
+------ first time
+sed -i 's/http:\/\/repo1.maven.org/https:\/\/repo1.maven.org/g' $KARAF_HOME/etc/org.ops4j.pax.url.mvn.cfg
+sed -i 's/kar\/4.2.7/kar\/4.2.7, \\\n    http\/4.2.7, \\\n    obr\/4.2.7, \\\n    war\/4.2.7/g' $KARAF_HOME/etc/org.apache.karaf.features.cfg
+$KARAF_HOME/bin/start
+
+
+
+cat $KARAF_HOME/data/log/karaf.log
+cat $KARAF_HOME/etc/org.apache.karaf.features.cfg
+
+
+sed -i 's/config\/4.2.7, \\\n    kar/yep/g' $KARAF_HOME/etc/org.apache.karaf.features.cfg
+
+
+sed -i 's/XML files\n/XML filez\r/g' $KARAF_HOME/etc/org.apache.karaf.features.cfg

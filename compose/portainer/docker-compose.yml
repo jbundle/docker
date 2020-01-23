@@ -1,0 +1,75 @@
+version: '3.7'
+
+services:
+  agent:
+    image: portainer/agent:${PORTAINER_AGENT_TAG:-latest}
+    environment:
+      # REQUIRED: Should be equal to the service name prefixed by "tasks." when
+      # deployed inside an overlay network
+      AGENT_CLUSTER_ADDR: tasks.agent
+      # AGENT_PORT: 9001
+      # LOG_LEVEL: debug
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      - default
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
+  portainer:
+    image: portainer/portainer:${PORTAINER_TAG:-latest}
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+#    ports:
+#      - "9001:9000"
+    volumes:
+      - portainer-data:/data
+    networks:
+      - default
+      - proxy
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.port=9000
+      - com.df.httpsOnly=true
+      - com.df.serviceDomain=${PORTAINER_SUB_DOMAIN:-portainer}.${DOMAIN_NAME:-docker.usc.edu}
+  backup:
+    image: osixia/backup-manager:${BACKUP_MANAGER_TAG:-latest}
+    hostname: ${PORTAINER_BACKUP_HOSTNAME:-portainer-backup}
+    environment:
+    - BACKUP_MANAGER_CRON_EXP=${BACKUP_CRON:-0 4 * * *}
+    - BACKUP_MANAGER_TARBALL_DIRECTORIES="/data/input"
+    - BACKUP_MANAGER_ARCHIVE_METHOD="${BACKUP_ARCHIVE_METHOD:-tarball-incremental}"
+    - BACKUP_MANAGER_UPLOAD_METHOD="${BACKUP_UPLOAD_METHOD:-none}"
+    volumes:
+      - backup:/data/backup
+      - portainer-data:/data/input
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  default:
+    driver: overlay
+    attachable: true
+  proxy:
+    external: true
+
+volumes:
+  portainer-data:
+    external: true
+    name: ${PORTAINER_DATA:-portainer-data}
+  backup:
+    external: true
+    name: ${BACKUP_DATA:-backup}

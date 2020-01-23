@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  hello-world:
+    image: tutum/hello-world:${HELLO_WORLD_TAG:-latest}
+    networks:
+      - proxy
+    ports:
+      - 8000:80
+    deploy:
+      replicas: 1
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.serviceDomain.1=hello-world.${DOMAIN_NAME:-docker.usc.edu}
+        - com.df.port.1=80
+networks:
+  proxy:
+    external: true

@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  wd-mongodb:
+    image: mongo:${MONGO_TAG:-latest}
+    command: --storageEngine wiredTiger
+    ports:
+      - 27017:27017
+    volumes:
+      - ${USC_BLOCK_DIR:-/docker-nfs}/wd-mongodb/data/db:/data/db
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+#      placement:
+#        constraints:
+#          - node.hostname==${NODE03}

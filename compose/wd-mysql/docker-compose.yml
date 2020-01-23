@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  wd-mysql:
+    image: mysql:${MYSQL_TAG:-latest}
+    ports:
+      - 3307:3306
+    volumes:
+      - /mnt/docker/disk2/wd-mysql:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE01}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DOCKER_WD_MYSQL_PASSWORD}

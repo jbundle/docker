@@ -1,0 +1,17 @@
+version: '3.5'
+services:
+  csc-mysql:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    volumes:
+      - /docker-nfs/wd-mysql:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DOCKER_WD_MYSQL_PASSWORD}

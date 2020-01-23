@@ -1,0 +1,37 @@
+version: '3.7'
+services:
+  mobile-setup:
+    image: uscdev/mobile-setup:${MOBILE_SETUP_TAG:-latest}
+    depends_on:
+      - mobile-db
+    networks:
+      - mobile-db
+      - web-bus
+    volumes:
+      - mobile-data:/var/www/html
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.hostname==${NODE00}
+    environment:
+      - WORDPRESS_DB_PASSWORD=${USC_MOBILE_DB_PASSWORD}
+      - WORDPRESS_DB_HOST=mobile-db
+      - USC_MOBILE_ADMIN_PASSWORD=${USC_MOBILE_ADMIN_PASSWORD}
+      - ServerName=${USC_MOBILE_SERVER_NAME}
+networks:
+  mobile-db:
+#    driver: overlay
+    external: true
+  web-bus:
+    external: true
+volumes:
+  mobile-db:
+    external: true
+  mobile-data:
+    external: true

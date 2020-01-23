@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+
+  visualizer:
+    image: dockersamples/visualizer:${VISUALIZER_TAG:-latest}
+    environment:
+    - CTX_ROOT=/
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.httpsOnly=true
+        - com.df.port=8080
+        - com.df.serviceDomain=${VISUALIZER_SUB_DOMAIN:-visualizer}.${DOMAIN_NAME:-docker.usc.edu}
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+networks:
+  proxy:
+    external: true

@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+
+  falco:
+    image: falcosecurity/falco:${FALCO_TAG:-latest}
+#    privileged: true
+    volumes:
+      - /var/run/docker.sock:/host/var/run/docker.sock
+      - /dev:/host/dev
+      - /proc:/host/proc:ro
+      - /boot:/host/boot:ro
+      - /lib/modules:/host/lib/modules:ro
+      - /usr:/host/usr:ro
+    networks:
+      - logging
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+      labels:
+        - security.monitor=falco
+
+networks:
+  logging:
+    external: true

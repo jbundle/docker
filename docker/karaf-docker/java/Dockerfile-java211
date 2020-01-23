@@ -1,0 +1,13 @@
+FROM tourgeek/ubuntu as builder
+ENV JAVA_VERSION=8u211
+ENV JDK_VERSION=1.8.0_211
+COPY docker-files-cache/jdk-$JAVA_VERSION-linux-x64.tar.gz /tmp/
+RUN tar zxvf /tmp/jdk-$JAVA_VERSION-linux-x64.tar.gz -C /tmp
+
+FROM tourgeek/ubuntu
+ENV JAVA_VERSION=8u211
+ENV JDK_VERSION=1.8.0_211
+ENV JAVA_HOME=/opt/oracle/java
+COPY --from=builder /tmp/jdk$JDK_VERSION /opt/oracle/jdk$JDK_VERSION
+RUN ln -s /opt/oracle/jdk$JDK_VERSION /opt/oracle/java
+RUN ln -s /opt/oracle/java/bin/java /usr/local/bin/java

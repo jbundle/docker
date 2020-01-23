@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  web:
+    image: nginx:${NGINX_ALPINE_TAG:-alpine}
+    volumes:
+    - type: volume
+      source: mydata
+      target: /data
+      volume:
+        nocopy: true
+    - type: bind
+      source: ./static
+      target: /opt/app/static
+
+  db:
+    image: postgres:${POSTGRES_TAG:-latest}
+    volumes:
+    - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
+    - "dbdata:/var/lib/postgresql/data"
+
+volumes:
+  mydata:
+  dbdata:
+
+  jenkins-zz:
+    driver: "cloudstor:aws"
+    driver_opts:
+      ebstype: gp2
+      size: 25
+      iops: 1000
+      backing: relocatable

@@ -1,0 +1,4 @@
+feature:install http obr war
+sleep 4000
+system:shutdown -f
+

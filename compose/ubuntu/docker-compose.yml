@@ -1,0 +1,55 @@
+version: '3.7'
+services:
+
+  ubuntu1:
+    image: ubuntu:${UBUNTU_TAG:-latest}
+    hostname: ubuntu1
+    command: sleep 36000
+    networks:
+    - ubuntu1
+    - ubuntu2
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  ubuntu2:
+    image: ubuntu:${UBUNTU_TAG:-latest}
+    hostname: ubuntu2
+    command: sleep 36000
+    networks:
+    - ubuntu1
+    - ubuntu3
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  ubuntu3:
+    image: ubuntu:${UBUNTU_TAG:-latest}
+    hostname: ubuntu3
+    command: sleep 36000
+    networks:
+    - ubuntu2
+    - ubuntu3
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  ubuntu1:
+    driver: overlay
+  ubuntu2:
+    driver: overlay
+  ubuntu3:
+    driver: overlay

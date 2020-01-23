@@ -1,0 +1,95 @@
+version: '3.7'
+services:
+
+  guacamole:
+    image: guacamole/guacamole:${GUACAMOLE_TAG:-latest}
+    hostname: guacamole
+    ports:
+    - 8082:8080
+    depends_on:
+    - guacd
+    - db
+    networks:
+    - proxy
+    - guacd
+    - db
+    environment:
+    - "GUACD_HOSTNAME=guacd"
+    - "GUACD_PORT=4822"
+    - "GUACAMOLE_HOME=/home"
+    - "MYSQL_HOSTNAME=db"
+    - "MYSQL_DATABASE=guacamole_db"
+    - "MYSQL_USER=guacamole_user"
+    - "MYSQL_PASSWORD=${GUACAMOLE_MYSQL_PASSWORD:-password}"
+    deploy:
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.port=8080
+      - com.df.xForwardedProto=true
+      - com.df.httpsOnly=true
+      - com.df.serviceDomain=${GUACAMOLE_SUB_DOMAIN:-guacamole}.${DOMAIN_NAME:-docker.usc.edu}
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  guacd:
+    image: guacamole/guacd:${GUACD_TAG:-latest}
+    hostname: guacd
+    networks:
+    - test
+    - guacd
+    ports:
+    - "4822:4822"
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  db:
+#    image: mysql:${GUACAMOLE_MYSQL_TAG:-latest}
+#    image: uscdev/guacamole-mysql-populated:${GUACAMOLE_MYSQL_TAG:-5.7}
+    image: uscdev/guacamole-mysql-populated:${GUACAMOLE_MYSQL_TAG:-latest}
+#    command: sleep 30000
+    hostname: db
+    networks:
+    - db
+    volumes:
+    - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${GUACAMOLE_MYSQL_ROOT_PASSWORD:-example}
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: ${GUACAMOLE_MYSQL_PASSWORD:-password}
+    user: mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+#      placement:
+#        constraints:
+#          - node.hostname==ip-172-31-13-131.us-east-2.compute.internal
+
+networks:
+  guacd:
+    driver: overlay
+  db:
+    driver: overlay
+  proxy:
+    external: true
+  test:
+    external: true
+
+volumes:
+  db:
+    external: true
+    name: guacamole-db

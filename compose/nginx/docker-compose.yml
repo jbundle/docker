@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+
+  nginx:
+    image: nginx:${NGINX_TAG:-latest}
+    hostname: nginx
+    ports:
+      - 80:80
+      - 443:443
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+

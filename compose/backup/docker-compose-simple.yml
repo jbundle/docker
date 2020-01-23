@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  jenkins:
+    image: osixia/backup:${BACKUP_TAG:-latest}
+#    environment:
+#      - BACKUP_CRON_EXP=30 * * * *
+    volumes:
+      - jenkins-backup:/data/backup
+      - jenkins-data:/data/input
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+volumes:
+  jenkins-data:
+    external: true
+  jenkins-backup:
+    external: true

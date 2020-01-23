@@ -1,0 +1,33 @@
+FROM tourgeek/ubuntu as builder
+ENV KARAF_VERSION=3.0.4
+ENV MAVEN_VERSION=3.6.3
+COPY docker-files-cache/apache-karaf-$KARAF_VERSION.tar.gz /tmp/
+RUN tar zxvf /tmp/apache-karaf-$KARAF_VERSION.tar.gz -C /tmp
+COPY release/apache-maven-$MAVEN_VERSION-bin.tar.gz /tmp/
+RUN tar zxvf /tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz -C /tmp
+
+FROM tourgeek/java
+ENV KARAF_VERSION=3.0.4
+ENV MAVEN_VERSION=3.6.3
+ENV KARAF_HOME=/opt/apache/karaf
+ENV MAVEN_HOME=/opt/apache/maven
+
+EXPOSE 1099 8101 44444
+EXPOSE 80 443
+
+# USER karaf
+RUN mkdir -p /home/karaf
+WORKDIR /home/karaf
+
+COPY --from=builder /tmp/apache-karaf-$KARAF_VERSION /opt/apache/apache-karaf-$KARAF_VERSION
+RUN ln -s /opt/apache/apache-karaf-$KARAF_VERSION /opt/apache/karaf
+RUN ln -s /opt/apache/karaf/bin/karaf /usr/local/bin/karaf
+
+COPY --from=builder /tmp/apache-maven-$MAVEN_VERSION /opt/apache/apache-maven-$MAVEN_VERSION
+RUN ln -s /opt/apache/apache-maven-$MAVEN_VERSION /opt/apache/maven
+RUN ln -s /opt/apache/maven/bin/mvn /usr/local/bin/mvn
+
+RUN chmod 755 /opt; \
+    sed -i "21s/out/stdout/" /opt/apache/karaf/etc/org.ops4j.pax.logging.cfg;
+
+CMD ["/opt/apache/karaf/bin/karaf"]
