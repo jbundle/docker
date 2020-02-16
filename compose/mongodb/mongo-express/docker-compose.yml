@@ -1,0 +1,43 @@
+version: '3.7'
+services:
+  mongo:
+    image: mongo:${MONGO_TAG:-latest}
+    command: --storageEngine wiredTiger
+    ports:
+      - 27017:27017
+#    volumes:
+#      - ${MONGODB_DIRECTORY:-/tmp/mongodb/data/db}:/data/db
+    networks:
+      - mongo
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ADMINUSERNAME:-tourgeek}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ADMINPASSWORD:-sa1sa}
+#      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo-password
+#      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/mongo-root
+  mongo-express:
+    image: mongo-express:${MONGO_EXPRESS_TAG:-latest}
+    ports:
+      - 8081:8081
+    networks:
+      - mongo
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGODB_ADMINUSERNAME:-tourgeek}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_ADMINPASSWORD:-sa1sa}
+networks:
+  default:
+  mongo:
+    external: true
