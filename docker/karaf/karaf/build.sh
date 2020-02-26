@@ -1,5 +1,5 @@
 #!/bin/bash
 
 docker build -t tourgeek/karaf:latest .
-docker tag tourgeek/karaf:latest tourgeek/karaf:4.2.7
+docker tag tourgeek/karaf:latest tourgeek/karaf:4.2.8
 #docker push
