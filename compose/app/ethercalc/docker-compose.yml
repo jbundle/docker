@@ -31,12 +31,18 @@ services:
         - com.df.sslVerifyNone=true
   db:
     image: redis
-    restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=changeme
       - MYSQL_DATABASE=gitea
       - MYSQL_USER=gitea
       - MYSQL_PASSWORD=changeme
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
     volumes:
       - ./db/:/var/lib/mysql
 networks:
