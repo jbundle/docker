@@ -1,0 +1,44 @@
+# Standalone git(hub like) instance
+version: '3.7'
+services:
+  gitea:
+    image: gitea/gitea
+#    ports:
+#      - 80:80
+#      - 443:80
+#    volumes:
+#      - ./data:/data
+    ports:
+      - "22:22"
+#      - "3000:3000"
+#    depends_on:
+#      - db
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.serviceDomain=gitea.${DOMAIN_NAME:-docker.usc.edu}
+        - com.df.httpsOnly=true
+        - com.df.port=3000
+        - com.df.sslVerifyNone=true
+  db:
+    image: mariadb:10
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_DATABASE=gitea
+      - MYSQL_USER=gitea
+      - MYSQL_PASSWORD=changeme
+    volumes:
+      - ./db/:/var/lib/mysql
+networks:
+  proxy:
+    external: true
