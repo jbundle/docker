@@ -13,5 +13,5 @@ docker exec -t karaf-tourgeek /opt/apache/karaf/bin/stop
 sleep 5
 
 docker commit karaf-tourgeek tourgeek/karaf-tourgeek-cache
-docker tag tourgeek/karaf-tourgeek-cache:latest tourgeek/karaf-tourgeek-cache:4.2.8
+docker tag tourgeek/karaf-tourgeek-cache:latest tourgeek/karaf-tourgeek-cache:4.2.9
 #docker push
