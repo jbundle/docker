@@ -13,5 +13,5 @@ docker exec -t karaf-obr /opt/apache/karaf/bin/stop
 sleep 5
 
 docker commit karaf-obr tourgeek/karaf-obr
-docker tag tourgeek/karaf-obr:latest tourgeek/karaf-obr:4.2.9
+docker tag tourgeek/karaf-obr:latest tourgeek/karaf-obr:4.2.12
 #docker push
