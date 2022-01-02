@@ -1,5 +1,5 @@
-FROM tourgeek/karaf:latest
-# FROM apache/karaf:4.2.7
+# FROM tourgeek/karaf:latest
+FROM apache/karaf:4.2.12
 COPY /src /tmp/src
 RUN apt update && apt upgrade -y && apt install -y procps
 # RUN $KARAF_HOME/bin/start && sleep 20 && $KARAF_HOME/bin/client -f /tmp/src/commands.txt && sleep 5 && $KARAF_HOME/bin/stop && sleep 10

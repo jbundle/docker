@@ -7,9 +7,9 @@ docker rm karaf-obr
 
 docker run -d --name karaf-obr tourgeek/karaf-obr:latest
 sleep 15
-docker exec -t karaf-obr /opt/apache/karaf/bin/client feature:install http obr war
+docker exec -t karaf-obr client feature:install http obr war
 sleep 5
-docker exec -t karaf-obr /opt/apache/karaf/bin/stop
+docker exec -t karaf-obr stop
 sleep 5
 
 docker commit karaf-obr tourgeek/karaf-obr
