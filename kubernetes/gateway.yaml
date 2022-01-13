@@ -1,0 +1,40 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: tourgeek-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: tourgeek-credential # must be the same as secret
+    hosts:
+    - "www.tourgeek.com"
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "www.tourgeek.com"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: httpbin
+spec:
+  hosts:
+  - "www.tourgeek.com"
+  gateways:
+  - tourgeek-gateway
+  http:
+  - match:
+    route:
+    - destination:
+        port:
+          number: 8000
+        host: karaf

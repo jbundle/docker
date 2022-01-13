@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: karaf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: karaf
+  labels:
+    app: karaf
+    service: karaf
+spec:
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8181
+  selector:
+    app: karaf
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: karaf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: karaf
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: karaf
+        version: v1
+    spec:
+      serviceAccountName: karaf
+      containers:
+      - image: docker.io/tourgeek/karaf-tourgeek
+        imagePullPolicy: IfNotPresent
+        name: karaf
+        ports:
+        - containerPort: 8181
