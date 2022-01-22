@@ -1,6 +1,6 @@
 FROM tourgeek/ubuntu:latest as builder
 
-ENV KARAF_VERSION=4.2.12
+ENV KARAF_VERSION=4.2.15
 ENV X=1
 COPY docker-files-cache /tmp/
 RUN tar zxvf /tmp/apache-karaf* -C /tmp/
@@ -9,7 +9,7 @@ RUN rm /tmp/*.tar.gz
 # RUN tar zxvf /tmp/apache-maven-$MAVEN_VERSION-bin.tar.gz -C /tmp
 
 FROM tourgeek/java:latest
-ENV KARAF_VERSION=4.2.12
+ENV KARAF_VERSION=4.2.15
 
 # Karaf environment variables
 ENV KARAF_INSTALL_PATH /opt/apache
